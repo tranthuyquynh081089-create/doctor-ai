@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DOCTOR AI – BÉ TẬP LÀM BÁC SĨ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mint: #a7f3d0;
+            --cream: #fef3c7;
+            --pink: #fbcfe8;
+            --blue: #bfdbfe;
+            --text-dark: #374151;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--cream);
+            background-image: radial-gradient(#fde68a 4px, transparent 4px);
+            background-size: 40px 40px;
+            color: var(--text-dark);
+            overflow: hidden; /* Prevent scrolling */
+            touch-action: manipulation; /* Improve touch response */
+        }
+
+        /* Custom Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes float-delay {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+        }
+
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes pulse-soft {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 207, 232, 0.7); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 15px rgba(251, 207, 232, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 207, 232, 0); }
+        }
+
+        @keyframes walk-to-clinic {
+            0% { transform: translateX(-50px); opacity: 0;}
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { transform: translateX(200px); opacity: 0;}
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* New Decorative Animations */
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(15deg); }
+        }
+        
+        @keyframes float-up {
+            0% { transform: translateY(110vh) scale(0.8); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+        }
+
+        /* Fun Background Pattern for Preschoolers */
+        .bg-pattern {
+            /* Now handled by body directly */
+        }
+        
+        .decor-star {
+            position: absolute;
+            animation: twinkle var(--dur, 3s) infinite ease-in-out;
+            pointer-events: none;
+            z-index: 5;
+        }
+        
+        .decor-heart {
+            position: absolute;
+            animation: float-up var(--dur, 10s) linear infinite;
+            pointer-events: none;
+            opacity: 0.7;
+            text-shadow: 0 4px 6px rgba(244, 114, 182, 0.4);
+            z-index: 5;
+        }
+
+        /* UI Elements Styling */
+        .screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: transparent;
+            z-index: 10;
+        }
+        
+        #screen-start {
+            z-index: 20;
+        }
+
+        .screen.active {
+            display: flex;
+            animation: bounce-in 0.5s ease-out;
+        }
+
+        /* 3D Jelly Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+            color: white;
+            padding: 15px 35px;
+            border-radius: 40px;
+            font-size: 1.25rem;
+            font-weight: 900;
+            border: 4px solid white;
+            border-bottom: 8px solid #16a34a; /* Thick 3D bottom */
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.4);
+            transition: all 0.1s;
+            text-shadow: 2px 2px 0px #15803d;
+        }
+
+        .btn-primary:active, .btn-primary:active:not(:disabled) {
+            transform: translateY(6px);
+            border-bottom-width: 2px;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);
+        }
+        
+        .btn-primary:disabled {
+            filter: grayscale(0.6);
+            opacity: 0.7;
+            border-bottom: 4px solid #6b7280;
+            cursor: not-allowed;
+            transform: none !important;
+            margin-bottom: 0 !important;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            border: 4px solid white;
+            border-bottom: 8px solid #2563eb; /* Thick 3D bottom */
+            box-shadow: 0 10px 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.1s;
+            text-shadow: 2px 2px 0px #1e40af;
+        }
+        
+        .btn-secondary:active {
+            transform: translateY(6px);
+            border-bottom-width: 2px;
+            margin-bottom: 6px;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 4px solid var(--mint);
+        }
+
+        .grid-numbers, .grid-symptoms {
+            display: grid;
+            gap: 15px;
+            padding: 10px;
+            width: 90%;
+            max-width: 800px;
+        }
+        
+        .grid-numbers { grid-template-columns: repeat(5, 1fr); }
+        .grid-symptoms { grid-template-columns: repeat(5, 1fr); }
+        
+        @media (max-width: 640px) {
+            .grid-numbers { grid-template-columns: repeat(3, 1fr); }
+            .grid-symptoms { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .item-box {
+            background: white;
+            border: 4px solid var(--blue);
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .item-box:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        /* Make item boxes more 3D */
+        .item-box {
+            background: white;
+            border: 4px solid #93c5fd;
+            border-bottom: 8px solid #60a5fa;
+            border-radius: 24px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.1s;
+            box-shadow: 0 6px 10px rgba(0,0,0,0.05);
+        }
+
+        .item-box:active {
+            transform: translateY(4px);
+            border-bottom-width: 4px;
+        }
+
+        .item-box:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 20px rgba(0,0,0,0.15);
+        }
+
+        .item-box.selected {
+            background-color: var(--mint);
+            border-color: #6ee7b7;
+            border-bottom-color: #10b981;
+            transform: scale(1.05);
+            animation: pulse-soft 2s infinite;
+        }
+
+        .emoji-icon {
+            font-size: 3rem;
+            margin-bottom: 8px;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+        }
+
+        .character-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 3D Round Buttons for Top Bar */
+        .sound-toggle, .home-toggle {
+            position: absolute;
+            top: 20px;
+            background: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.1s;
+        }
+
+        .sound-toggle {
+            right: 20px;
+            border: 4px solid #f9a8d4;
+            border-bottom: 8px solid #f472b6;
+            box-shadow: 0 8px 15px rgba(244, 114, 182, 0.3);
+        }
+
+        .home-toggle {
+            left: 20px;
+            border: 4px solid #93c5fd;
+            border-bottom: 8px solid #60a5fa;
+            box-shadow: 0 8px 15px rgba(96, 165, 250, 0.3);
+            display: none; /* Hidden on start screen */
+        }
+
+        .sound-toggle:active, .home-toggle:active {
+            transform: translateY(4px);
+            border-bottom-width: 4px;
+        }
+
+        .title-text {
+            color: #4f46e5;
+            text-shadow: 2px 2px 0px white, -2px -2px 0px white, 2px -2px 0px white, -2px 2px 0px white, 0px 4px 4px rgba(0,0,0,0.1);
+            font-weight: 900;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        /* Tool styling */
+        .tool-box {
+            font-size: 4rem;
+            padding: 20px;
+            background: white;
+            border-radius: 50%;
+            border: 5px dashed var(--pink);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tool-box:active {
+            transform: scale(0.9);
+        }
+        
+        .tool-box.used {
+            opacity: 0.5;
+            border-style: solid;
+            background: var(--mint);
+            pointer-events: none;
+            animation: pop 0.3s ease-out;
+            filter: grayscale(0.5);
+        }
+
+        /* Status bar centered and bubbly */
+        .status-bar {
+    <div class="routing-animation">
+            font-size: 5rem;
+            position: absolute;
+            animation: walk-to-clinic 4s linear forwards;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Global Decorations (Hearts & Stars) -->
+    <div class="fixed inset-0 pointer-events-none z-[5]" id="global-decorations" style="display: none;">
+        <!-- Stars -->
+        <div class="decor-star" style="top: 10%; left: 10%; --dur: 2.5s; font-size: 2rem;">⭐</div>
+        <div class="decor-star" style="top: 25%; right: 15%; --dur: 3.2s; font-size: 2.5rem;">✨</div>
+        <div class="decor-star" style="bottom: 30%; left: 15%; --dur: 2.8s; font-size: 1.8rem;">🌟</div>
+        <div class="decor-star" style="top: 45%; right: 35%; --dur: 4s; font-size: 2.2rem;">⭐</div>
+        <div class="decor-star" style="bottom: 15%; right: 10%; --dur: 3.5s; font-size: 2rem;">✨</div>
+        
+        <!-- Hearts -->
+        <div class="decor-heart" style="left: 8%; --dur: 12s; font-size: 2.5rem; animation-delay: 0s;">💖</div>
+        <div class="decor-heart" style="left: 25%; --dur: 15s; font-size: 2rem; animation-delay: 3s;">💕</div>
+        <div class="decor-heart" style="left: 50%; --dur: 10s; font-size: 3rem; animation-delay: 1s;">💗</div>
+        <div class="decor-heart" style="left: 75%; --dur: 14s; font-size: 2.2rem; animation-delay: 4s;">💖</div>
+        <div class="decor-heart" style="left: 90%; --dur: 11s; font-size: 2.8rem; animation-delay: 2s;">💓</div>
+    </div>
+
+    <!-- Top Action Buttons -->
+    <div class="sound-toggle" id="btn-sound" onclick="toggleSound()">🔊</div>
+    <div class="home-toggle group" id="btn-home" onclick="goHome()" title="Về trang chủ">
+        <span class="text-red-500 transform group-hover:scale-110 transition-transform font-black" style="text-shadow: 0 4px 6px rgba(239, 68, 68, 0.4); font-size: 2.2rem; line-height: 1;">✚</span>
+    </div>
+
+    <!-- Status Bar -->
+    <div id="status-bar" class="status-bar">
+        <span>Số:</span> <span id="status-number" class="text-pink-500 text-2xl bg-pink-100 px-3 py-1 rounded-full mx-1">--</span> | 
+        <span>Bệnh:</span> <span id="status-symptom" class="text-green-600 bg-green-100 px-3 py-1 rounded-full mx-1">Chưa rõ</span>
+    </div>
+
+    <!-- ==========================================
+         1. START SCREEN (RECREATED WITH CSS/EMOJI) 
+         ========================================== -->
+    <div id="screen-start" class="screen active relative overflow-hidden" style="background-color: #fef08a;">
+        
+        <!-- Background Room Details -->
+        <div class="absolute bottom-0 w-full h-[35%] bg-[#99f6e4] border-t-[10px] border-[#5eead4]"></div>
+        
+        <!-- Book Shelf -->
+        <div class="absolute left-[5%] top-[15%] w-[12%] h-[50%] bg-[#3b82f6] border-4 border-[#2563eb] rounded flex flex-col justify-around px-2 shadow-xl">
+            <div class="w-full h-2 bg-[#2563eb]"></div>
+            <div class="flex items-end text-3xl space-x-1"><span>📕</span><span>📘</span></div>
+            <div class="w-full h-2 bg-[#2563eb]"></div>
+            <div class="flex items-end text-2xl space-x-1"><span>📦</span><span>💊</span></div>
+        </div>
+
+        <!-- Window with Sun -->
+        <div class="absolute right-[5%] top-[10%] w-[18%] h-[30%] bg-white border-[10px] border-amber-200 shadow-[inset_0_0_30px_rgba(253,224,71,0.8)] overflow-hidden rounded">
+            <div class="absolute inset-0 border-x-4 border-amber-200 left-1/2 -ml-[2px]"></div>
+            <div class="absolute inset-0 border-y-4 border-amber-200 top-1/2 -mt-[2px]"></div>
+        </div>
+
+        <!-- Eye Chart & Poster -->
+        <div class="absolute left-[22%] top-[15%] w-[10%] h-[20%] bg-white border-4 border-gray-300 shadow-md flex flex-col items-center justify-center font-bold text-gray-800">
+            <span class="text-2xl">E</span>
+            <span class="text-lg">F P</span>
+            <span class="text-sm">T O Z</span>
+        </div>
+        <div class="absolute left-[35%] top-[15%] w-[12%] h-[20%] bg-amber-50 border-4 border-amber-400 shadow-md flex items-center justify-center text-5xl">🐶</div>
+
+        <!-- Title Section -->
+        <div class="absolute top-[8%] z-10 w-full text-center flex flex-col items-center drop-shadow-xl">
+            <div class="flex items-center justify-center gap-4 mb-2">
+                <span class="text-5xl">🏥</span>
+                <span class="text-5xl text-pink-500 animate-pulse">💖</span>
+                <span class="text-5xl">🧬</span>
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-widest text-[#38bdf8]" style="-webkit-text-stroke: 4px white; text-shadow: 0 10px 15px rgba(0,0,0,0.1);">
+                DOCTOR <span class="text-[#f472b6]">AI</span>
+            </h1>
+        </div>
+
+        <!-- Characters (Doctor & Robot) -->
+        <div class="absolute bottom-[20%] w-full flex justify-center items-end z-20 gap-4 md:gap-12">
+            <!-- Doctor -->
+            <div class="text-[140px] md:text-[200px] leading-none mb-[-10px] md:mb-[-20px] character-float z-10 drop-shadow-[0_15px_15px_rgba(0,0,0,0.2)]">👩‍⚕️</div>
+            <!-- Robot -->
+            <div class="text-[80px] md:text-[120px] leading-none mb-[80px] md:mb-[120px] z-10 drop-shadow-[0_10px_10px_rgba(0,0,0,0.2)]" style="animation: float-delay 3s ease-in-out infinite;">🤖</div>
+        </div>
+        
+        <!-- Desk -->
+        <div class="absolute bottom-[10%] w-[90%] md:w-[70%] h-[15%] md:h-[20%] bg-[#d97706] rounded-t-3xl border-t-[10px] border-[#f59e0b] shadow-[0_-10px_30px_rgba(0,0,0,0.2)] z-30 flex justify-center items-start pt-2 md:pt-6 gap-6 md:gap-12 text-4xl md:text-6xl">
+            <span>💻</span>
+            <span class="mt-4">📚</span>
+            <span>💊</span>
+        </div>
+
+        <!-- Big Green Button -->
+        <button class="absolute bottom-[4%] z-40 bg-gradient-to-b from-[#4ade80] to-[#22c55e] text-white font-black text-xl md:text-3xl py-4 md:py-5 px-8 md:px-12 rounded-full border-[6px] border-white shadow-[0_10px_20px_rgba(0,0,0,0.25),inset_0_-5px_15px_rgba(0,0,0,0.2)] hover:scale-105 active:scale-95 transition-all flex items-center gap-3 md:gap-4 group" onclick="startGame()">
+            BẮT ĐẦU VÀO KHÁM
+            <span class="bg-[#f97316] rounded-full w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-white text-lg md:text-xl border-4 border-white shadow-inner group-hover:rotate-12 transition-transform">▶</span>
+        </button>
+        
+        <!-- Sparkles Overlay -->
+        <div class="absolute top-[30%] left-[20%] text-2xl animate-pulse">✨</div>
+        <div class="absolute top-[40%] right-[25%] text-4xl animate-pulse" style="animation-delay: 0.7s;">✨</div>
+        <div class="absolute bottom-[35%] left-[30%] text-3xl animate-pulse" style="animation-delay: 0.3s;">✨</div>
+
+    </div>
+
+    <!-- 2. Number Selection Screen -->
+    <div id="screen-numbers" class="screen bg-pattern">
+        <h2 class="text-3xl md:text-5xl mb-6 title-text">Chọn số thứ tự khám</h2>
+        <div class="bg-white p-6 rounded-[2rem] shadow-xl border-8 border-blue-200 mb-8 mt-4">
+            <div class="grid-numbers" id="numbers-container">
+                <!-- Numbers generated by JS -->
+            </div>
+        </div>
+        <div class="flex gap-6">
+            <button class="btn-secondary" onclick="goBack('start')">QUAY LẠI</button>
+            <button class="btn-primary opacity-50 cursor-not-allowed" id="btn-next-number" onclick="goToSymptoms()" disabled>TIẾP TỤC ➡️</button>
+        </div>
+    </div>
+
+    <!-- 3. Symptom Selection Screen -->
+    <div id="screen-symptoms" class="screen bg-pattern">
+        <div class="flex items-center gap-4 mb-4 mt-8">
+            <span class="text-6xl character-float drop-shadow-md">🧒</span>
+            <div class="bg-white p-3 rounded-2xl border-4 border-pink-200 shadow-md relative">
+                <div class="absolute top-1/2 -left-3 w-4 h-4 bg-white border-l-4 border-b-4 border-pink-200 transform -translate-y-1/2 rotate-45"></div>
+                <h2 class="text-2xl md:text-3xl font-black text-pink-500">Bạn nhỏ đang bị làm sao vậy?</h2>
+            </div>
+        </div>
+        
+        <div class="bg-white p-4 rounded-[2rem] shadow-xl border-8 border-pink-200 mb-6 w-[95%] max-w-4xl max-h-[55vh] overflow-y-auto">
+            <div class="grid-symptoms" id="symptoms-container">
+                <!-- Symptoms generated by JS -->
+            </div>
+        </div>
+        
+        <div class="flex gap-6">
+            <button class="btn-secondary" onclick="resetSymptom()">CHỌN LẠI</button>
+            <button class="btn-primary opacity-50 cursor-not-allowed" id="btn-next-symptom" onclick="goToRouting()" disabled>ĐẾN PHÒNG KHÁM 🏥</button>
+        </div>
+    </div>
+
+    <!-- 4. Routing Screen (Animation) -->
+    <div id="screen-routing" class="screen bg-pattern">
+        <h2 class="text-4xl md:text-5xl title-text mb-12" id="routing-title">Đang đưa bạn đến phòng khám...</h2>
+        
+        <div class="relative w-full max-w-2xl h-64 bg-white rounded-[3rem] border-8 border-mint-200 shadow-xl flex items-center overflow-hidden">
+            <!-- Road/Path -->
+            <div class="absolute w-full h-8 bg-gray-100 top-1/2 transform -translate-y-1/2 border-y-4 border-dashed border-gray-300"></div>
+            
+            <!-- Clinic Door -->
+            <div class="absolute right-10 flex flex-col items-center">
+                <span class="text-6xl drop-shadow-md">🚪</span>
+                <span class="font-bold text-white mt-2 bg-blue-500 px-4 py-2 rounded-full text-lg border-2 border-white shadow-md" id="routing-clinic-name">Phòng khám</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Examination Screen -->
+    <div id="screen-exam" class="screen bg-pattern">
+        <div class="bg-blue-100 px-8 py-3 rounded-full mb-6 border-4 border-blue-300 shadow-md mt-10">
+            <h2 class="text-3xl font-black text-blue-800" id="exam-clinic-title">Phòng khám</h2>
+        </div>
+        
+        <div class="flex items-center gap-6 mb-10 bg-white p-8 rounded-[2.5rem] shadow-xl border-8 border-pink-200">
+            <div class="relative">
+                <span class="text-7xl md:text-8xl drop-shadow-lg">👩‍⚕️</span>
+                <span class="absolute -bottom-2 -right-2 text-4xl drop-shadow-md bg-white rounded-full p-1 border-2 border-gray-200" id="exam-symptom-emoji">🤒</span>
+            </div>
+            <div class="bg-gray-50 p-5 rounded-3xl border-4 border-gray-200 max-w-sm relative shadow-inner">
+                <!-- Speech bubble tail -->
+                <div class="absolute top-1/2 -left-4 w-6 h-6 bg-gray-50 border-l-4 border-b-4 border-gray-200 transform -translate-y-1/2 rotate-45"></div>
+                <p class="text-xl font-bold text-gray-700" id="exam-instruction">Bé hãy dùng các dụng cụ bên dưới để khám cho bệnh nhân nhé!</p>
+            </div>
+        </div>
+
+        <h3 class="text-2xl font-black text-pink-500 mb-6 bg-white px-6 py-2 rounded-full shadow-sm border-2 border-pink-100">👇 Chạm vào dụng cụ để khám 👇</h3>
+        
+        <div class="flex gap-6 justify-center flex-wrap mb-10" id="tools-container">
+            <!-- Tools generated by JS -->
+        </div>
+        
+        <button class="btn-primary hidden" id="btn-finish-exam" onclick="goToResult()">XEM KẾT QUẢ 📋</button>
+    </div>
+
+    <!-- 6. Result Screen -->
+    <div id="screen-result" class="screen bg-pattern">
+        <h2 class="text-4xl md:text-5xl title-text mb-8 mt-10">Kết quả khám bệnh</h2>
+        
+        <div class="card p-10 max-w-3xl text-center mb-10 relative overflow-hidden border-8 border-green-300 rounded-[3rem]">
+            <div class="absolute top-0 right-0 bg-green-400 text-white px-6 py-2 rounded-bl-3xl font-black text-lg shadow-md border-b-4 border-l-4 border-green-500">Hoàn thành</div>
+            <span class="text-8xl md:text-[8rem] block mb-8 drop-shadow-lg character-float" id="result-emoji">🌟</span>
+            <p class="text-2xl md:text-3xl font-bold text-gray-700 leading-relaxed bg-green-50 p-6 rounded-3xl border-2 border-green-100" id="result-text">
+                Kết quả sẽ hiển thị ở đây.
+            </p>
+        </div>
+        
+        <button class="btn-primary text-2xl px-12 py-4" onclick="goToEnd()">TIẾP TỤC ➡️</button>
+    </div>
+
+    <!-- 7. End Screen -->
+    <div id="screen-end" class="screen bg-pattern">
+        <h2 class="text-5xl md:text-6xl title-text text-pink-500 mb-6 drop-shadow-lg">Tuyệt vời! 🎉</h2>
+        <p class="text-2xl md:text-3xl text-gray-700 font-black mb-12 text-center px-4 bg-white py-4 rounded-full border-4 border-yellow-300 shadow-md">Các bác sĩ nhí đã làm rất tốt nhiệm vụ hôm nay.</p>
+        
+        <div class="flex text-8xl md:text-[9rem] gap-8 mb-16 character-float drop-shadow-xl">
+            <span>👩‍⚕️</span>
+            <span class="animate-pulse">💖</span>
+            <span>🧒</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-6">
+            <button class="btn-primary text-xl" onclick="nextPatient()">KHÁM BỆNH NHÂN TIẾP THEO</button>
+            <button class="btn-secondary text-xl" onclick="goHome()">QUAY VỀ TRANG CHỦ</button>
+        </div>
+    </div>
+
+    <!-- Audio Synthesis & Logic -->
+    <script>
+        // --- Data ---
+        const SYMPTOMS = [
+            { id: 'ho', name: 'Ho', emoji: '🗣️', clinic: 'tmt', result: 'Bạn nhỏ có dấu hiệu ho. Chúng mình hãy uống nước ấm theo hướng dẫn của người lớn và giữ ấm cơ thể nhé!' },
+            { id: 'sot', name: 'Sốt', emoji: '🤒', clinic: 'nhi', result: 'Bạn nhỏ có dấu hiệu sốt. Chúng mình cần báo cho cô giáo hoặc bố mẹ để được chăm sóc nhé!' },
+            { id: 'somui', name: 'Sổ mũi', emoji: '🤧', clinic: 'tmt', result: 'Bạn nhỏ bị sổ mũi. Hãy dùng khăn giấy sạch và rửa tay sau khi lau mũi nhé!' },
+            { id: 'daubung', name: 'Đau bụng', emoji: '🤢', clinic: 'tieuhoa', result: 'Bạn nhỏ bị đau bụng. Chúng mình hãy báo cho cô giáo hoặc bố mẹ để được giúp đỡ nhé!' },
+            { id: 'daudau', name: 'Đau đầu', emoji: '🤕', clinic: 'thankinh', result: 'Bạn nhỏ bị đau đầu. Hãy nghỉ ngơi và nhờ người lớn giúp đỡ nhé!' },
+            { id: 'daurang', name: 'Đau răng', emoji: '🦷', clinic: 'rhm', result: 'Bạn nhỏ bị đau răng. Chúng mình cần nhờ người lớn đưa đến bác sĩ nha khoa nhé!' },
+            { id: 'moimat', name: 'Mỏi mắt', emoji: '😵', clinic: 'mat', result: 'Bạn nhỏ bị mỏi mắt. Hãy cho mắt nghỉ ngơi và hạn chế nhìn màn hình quá lâu nhé!' },
+            { id: 'matngu', name: 'Mất ngủ', emoji: '🥱', clinic: 'giacngu', result: 'Bạn nhỏ khó ngủ. Hãy đi ngủ đúng giờ, giữ phòng ngủ yên tĩnh và nhờ người lớn giúp đỡ nhé!' },
+            { id: 'keman', name: 'Kém ăn', emoji: '🍽️', clinic: 'nhi', result: 'Bạn nhỏ ăn chưa ngon miệng. Hãy ăn uống đủ chất và nhờ người lớn chăm sóc nhé!' },
+            { id: 'metmoi', name: 'Mệt mỏi', emoji: '😮‍💨', clinic: 'nhi', result: 'Bạn nhỏ đang mệt. Hãy nghỉ ngơi, uống nước và báo cho người lớn nhé!' }
+        ];
+
+        const CLINICS = {
+            'tmt': { name: 'Phòng khám Tai - Mũi - Họng', tools: ['🩺', '🔦'] },
+            'nhi': { name: 'Phòng khám Nhi khoa', tools: ['🌡️', '🩺'] },
+            'tieuhoa': { name: 'Phòng khám Tiêu hóa', tools: ['🩺', '🖐️'] },
+            'thankinh': { name: 'Phòng khám Thần kinh', tools: ['🔨', '🔦'] },
+            'rhm': { name: 'Phòng khám Răng - Hàm - Mặt', tools: ['🪞', '💡'] },
+            'mat': { name: 'Phòng khám Mắt', tools: ['👁️', '🔦'] },
+            'giacngu': { name: 'Phòng khám Tư vấn giấc ngủ', tools: ['⏰', '🩺'] }
+        };
+
+        // --- State ---
+        let state = {
+            soundOn: true,
+            currentScreen: 'start',
+            patientNum: null,
+            symptomId: null,
+            toolsUsed: 0
+        };
+
+        // --- Audio System ---
+        const synth = window.speechSynthesis;
+        let voiceVN = null;
+
+        // Simple Beep Sound using Web Audio API
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep(type = 'click') {
+            if (!state.soundOn) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            
+            if (type === 'click') {
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime);
+                oscillator.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'success') {
+                oscillator.type = 'triangle';
+                oscillator.frequency.setValueAtTime(400, audioCtx.currentTime);
+                oscillator.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+                oscillator.frequency.setValueAtTime(800, audioCtx.currentTime + 0.2);
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.3);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            } else if (type === 'tool') {
+                oscillator.type = 'square';
+                oscillator.frequency.setValueAtTime(300, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                oscillator.start(audioCtx.currentTime);
+                oscillator.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        function initVoice() {
+            const populateVoices = () => {
+                const voices = synth.getVoices();
+                voiceVN = voices.find(v => v.lang === 'vi-VN' && v.name.toLowerCase().includes('female')) 
+                       || voices.find(v => v.lang === 'vi-VN') 
+                       || voices[0];
+            };
+            populateVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoices;
+            }
+        }
+
+        function speak(text) {
+            if (!state.soundOn) return;
+            try {
+                synth.cancel(); // Stop current speech
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'vi-VN';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.2;
+                if (voiceVN) utterance.voice = voiceVN;
+                synth.speak(utterance);
+            } catch (e) {
+                console.log("SpeechSynthesis error: ", e);
+            }
+        }
+
+        function toggleSound() {
+            state.soundOn = !state.soundOn;
+            document.getElementById('btn-sound').innerText = state.soundOn ? '🔊' : '🔇';
+            if (!state.soundOn) synth.cancel();
+            else playBeep();
+        }
+
+        // --- UI Logic ---
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => {
+                s.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+            state.currentScreen = screenId;
+            updateStatusBar();
+        }
+
+        function updateStatusBar() {
+            const bar = document.getElementById('status-bar');
+            const btnHome = document.getElementById('btn-home');
+            const globalDecor = document.getElementById('global-decorations');
+
+            if (['screen-start'].includes(state.currentScreen)) {
+                bar.style.display = 'none';
+                btnHome.style.display = 'none';
+                if (globalDecor) globalDecor.style.display = 'none';
+            } else if (['screen-end'].includes(state.currentScreen)) {
+                bar.style.display = 'none';
+                btnHome.style.display = 'flex';
+                if (globalDecor) globalDecor.style.display = 'block';
+            } else {
+                bar.style.display = 'block';
+                btnHome.style.display = 'flex';
+                if (globalDecor) globalDecor.style.display = 'block';
+                document.getElementById('status-number').innerText = state.patientNum ? state.patientNum.toString().padStart(2, '0') : '--';
+                const sym = SYMPTOMS.find(s => s.id === state.symptomId);
+                document.getElementById('status-symptom').innerText = sym ? sym.name : 'Chưa rõ';
+            }
+        }
+
+        // --- Screen Functions ---
+        function startGame() {
+            playBeep();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            // Wake up speech synthesis
+            let utterance = new SpeechSynthesisUtterance('');
+            synth.speak(utterance);
+            initVoice();
+            
+            speak("Xin chào các bạn nhỏ! Chào mừng các con đến với phòng khám Doctor AI. Các bạn hãy cùng bấm chọn để vào khám bệnh cùng Doctor AI nhé.");
+            
+            setTimeout(() => {
+                renderNumbers();
+                switchScreen('screen-numbers');
+            }, 300);
+        }
+
+        function renderNumbers() {
+            const container = document.getElementById('numbers-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= 10; i++) {
+                const div = document.createElement('div');
+                div.className = `item-box text-3xl font-bold text-blue-600 ${state.patientNum === i ? 'selected' : ''}`;
+                div.innerText = i.toString().padStart(2, '0');
+                div.onclick = () => selectNumber(i, div);
+                container.appendChild(div);
+            }
+            checkNextButton('number');
+        }
+
+        function selectNumber(num, element) {
+            playBeep();
+            state.patientNum = num;
+            renderNumbers();
+            speak(`Bệnh nhân số ${num.toString().padStart(2, '0')} đã sẵn sàng khám bệnh!`);
+            checkNextButton('number');
+        }
+
+        function goBack(to) {
+            playBeep();
+            synth.cancel();
+            if (to === 'start') switchScreen('screen-start');
+        }
+
+        function checkNextButton(type) {
+            if (type === 'number') {
+                const btn = document.getElementById('btn-next-number');
+                if (state.patientNum) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            } else if (type === 'symptom') {
+                const btn = document.getElementById('btn-next-symptom');
+                if (state.symptomId) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                } else {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        function goToSymptoms() {
+            playBeep();
+            synth.cancel();
+            renderSymptoms();
+            switchScreen('screen-symptoms');
+            speak("Bạn nhỏ đang cảm thấy thế nào? Các bác sĩ nhí hãy giúp bạn chọn triệu chứng nhé!");
+        }
+
+        function renderSymptoms() {
+            const container = document.getElementById('symptoms-container');
+            container.innerHTML = '';
+            SYMPTOMS.forEach(sym => {
+                const div = document.createElement('div');
+                div.className = `item-box ${state.symptomId === sym.id ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <div class="emoji-icon">${sym.emoji}</div>
+                    <div class="font-bold text-center text-sm md:text-base">${sym.name}</div>
+                `;
+                div.onclick = () => selectSymptom(sym.id);
+                container.appendChild(div);
+            });
+            checkNextButton('symptom');
+        }
+
+        function selectSymptom(id) {
+            playBeep();
+            state.symptomId = id;
+            renderSymptoms();
+            const sym = SYMPTOMS.find(s => s.id === id);
+            const clinic = CLINICS[sym.clinic];
+            updateStatusBar();
+            speak(`Bạn nhỏ đang bị ${sym.name.toLowerCase()}. Chúng mình cùng đưa bạn đến ${clinic.name} nhé!`);
+            checkNextButton('symptom');
+        }
+
+        function resetSymptom() {
+            playBeep();
+            state.symptomId = null;
+            renderSymptoms();
+            updateStatusBar();
+        }
+
+        function goToRouting() {
+            playBeep();
+            synth.cancel();
+            switchScreen('screen-routing');
+            
+            const sym = SYMPTOMS.find(s => s.id === state.symptomId);
+            const clinic = CLINICS[sym.clinic];
+            
+            document.getElementById('routing-clinic-name').innerText = clinic.name;
+            speak(`Bạn nhỏ bị ${sym.name.toLowerCase()}. Chúng mình sẽ đến ${clinic.name} nhé!`);
+
+            const patient = document.getElementById('routing-patient');
+            patient.style.animation = 'none';
+            patient.offsetHeight;
+            patient.style.animation = null; 
+
+            setTimeout(() => {
+                goToExam();
+            }, 4500);
+        }
+
+        function goToExam() {
+            switchScreen('screen-exam');
+            const sym = SYMPTOMS.find(s => s.id === state.symptomId);
+            const clinic = CLINICS[sym.clinic];
+            
+            document.getElementById('exam-clinic-title').innerText = clinic.name;
+            document.getElementById('exam-symptom-emoji').innerText = sym.emoji;
+            document.getElementById('btn-finish-exam').classList.add('hidden');
+            
+            state.toolsUsed = 0;
+            renderTools(clinic.tools);
+
+            speak("Xin chào bạn nhỏ! Bác sĩ sẽ khám cho con nhé. Con hãy ngồi thật thoải mái nào! Bác sĩ nhí hãy chạm vào dụng cụ để khám.");
+        }
+
+        function renderTools(tools) {
+            const container = document.getElementById('tools-container');
+            container.innerHTML = '';
+            tools.forEach((tool, index) => {
+                const div = document.createElement('div');
+                div.className = 'tool-box';
+                div.innerText = tool;
+                div.id = `tool-${index}`;
+                div.onclick = () => useTool(div, index, tools.length);
+                container.appendChild(div);
+            });
+        }
+
+        function useTool(element, index, totalTools) {
+            if (element.classList.contains('used')) return;
+            
+            playBeep('tool');
+            element.classList.add('used');
+            state.toolsUsed++;
+
+            if (state.toolsUsed >= totalTools) {
+                setTimeout(() => {
+                    document.getElementById('btn-finish-exam').classList.remove('hidden');
+                    document.getElementById('btn-finish-exam').classList.add('animate-bounce');
+                    playBeep('success');
+                    speak("Các bác sĩ nhí đã khám xong cho bạn nhỏ. Bây giờ chúng mình cùng xem kết quả nhé!");
+                }, 500);
+            }
+        }
+
+        function goToResult() {
+            playBeep();
+            synth.cancel();
+            switchScreen('screen-result');
+            
+            const sym = SYMPTOMS.find(s => s.id === state.symptomId);
+            document.getElementById('result-emoji').innerText = sym.emoji;
+            document.getElementById('result-text').innerText = sym.result;
+            
+            speak(sym.result);
+        }
+
+        function goToEnd() {
+            playBeep();
+            synth.cancel();
+            switchScreen('screen-end');
+            speak("Chúc mừng các bác sĩ nhí! Chúng mình đã hoàn thành một lượt khám bệnh thật tuyệt vời!");
+        }
+
+        function nextPatient() {
+            playBeep();
+            let nextNum = (state.patientNum || 0) + 1;
+            if (nextNum > 10) nextNum = 1;
+            
+            state.patientNum = nextNum;
+            state.symptomId = null;
+            state.toolsUsed = 0;
+            
+            goToSymptoms();
+            speak(`Bệnh nhân số ${nextNum.toString().padStart(2, '0')} đã sẵn sàng!`);
+        }
+
+        function goHome() {
+            playBeep();
+            synth.cancel();
+            state.patientNum = null;
+            state.symptomId = null;
+            state.toolsUsed = 0;
+            switchScreen('screen-start');
+        }
+
+        window.addEventListener('load', initVoice);
+
+    </script>
+</body>
+</html>
